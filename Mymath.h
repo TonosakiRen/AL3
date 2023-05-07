@@ -75,13 +75,24 @@ inline Vector3 Normalize(const Vector3& v) {
 	tmp = sqrtf(tmp);
 	return { v.x / tmp, v.y / tmp, v.z / tmp };
 }
+//ベクトル変換
+inline Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
+
+	Vector3 result{
+	    v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
+	    v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],
+	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2],
+	};
+
+	return result;
+}
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
 
 
 #pragma endregion
 #pragma region Matrix3x3
-Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] + m2.m[0][0];
 	tmp.m[0][1] = m1.m[0][1] + m2.m[0][1];
@@ -102,7 +113,7 @@ Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return tmp;
 
 }
-Matrix4x4 operator +(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 operator +(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] + m2.m[0][0];
 	tmp.m[0][1] = m1.m[0][1] + m2.m[0][1];
@@ -122,7 +133,7 @@ Matrix4x4 operator +(const Matrix4x4& m1, const Matrix4x4& m2) {
 	tmp.m[3][3] = m1.m[3][3] + m2.m[3][3];
 	return tmp;
 }
-Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] - m2.m[0][0];
 	tmp.m[0][1] = m1.m[0][1] - m2.m[0][1];
@@ -142,7 +153,7 @@ Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
 	tmp.m[3][3] = m1.m[3][3] - m2.m[3][3];
 	return tmp;
 }
-Matrix4x4 operator -(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 operator -(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] - m2.m[0][0];
 	tmp.m[0][1] = m1.m[0][1] - m2.m[0][1];
@@ -162,7 +173,7 @@ Matrix4x4 operator -(const Matrix4x4& m1, const Matrix4x4& m2) {
 	tmp.m[3][3] = m1.m[3][3] - m2.m[3][3];
 	return tmp;
 }
-Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] * m2.m[0][0] + m1.m[0][1] * m2.m[1][0] + m1.m[0][2] * m2.m[2][0] + m1.m[0][3] * m2.m[3][0];
 	tmp.m[0][1] = m1.m[0][0] * m2.m[0][1] + m1.m[0][1] * m2.m[1][1] + m1.m[0][2] * m2.m[2][1] + m1.m[0][3] * m2.m[3][1];
@@ -185,7 +196,7 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	tmp.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] + m1.m[3][3] * m2.m[3][3];
 	return tmp;
 }
-Matrix4x4 operator *(const Matrix4x4& m1, const Matrix4x4& m2) {
+inline Matrix4x4 operator *(const Matrix4x4& m1, const Matrix4x4& m2) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] * m2.m[0][0] + m1.m[0][1] * m2.m[1][0] + m1.m[0][2] * m2.m[2][0] + m1.m[0][3] * m2.m[3][0];
 	tmp.m[0][1] = m1.m[0][0] * m2.m[0][1] + m1.m[0][1] * m2.m[1][1] + m1.m[0][2] * m2.m[2][1] + m1.m[0][3] * m2.m[3][1];
@@ -208,7 +219,7 @@ Matrix4x4 operator *(const Matrix4x4& m1, const Matrix4x4& m2) {
 	tmp.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] + m1.m[3][3] * m2.m[3][3];
 	return tmp;
 }
-Matrix4x4 Inverse(const Matrix4x4& m) {
+inline Matrix4x4 Inverse(const Matrix4x4& m) {
 	float lal = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]
 		+ m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1]
 		+ m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]
@@ -295,7 +306,7 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 
 	return tmp;
 }
-Matrix4x4 Transpose(const Matrix4x4& m) {
+inline Matrix4x4 Transpose(const Matrix4x4& m) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = m.m[0][0];
 	tmp.m[0][1] = m.m[1][0];
@@ -319,7 +330,7 @@ Matrix4x4 Transpose(const Matrix4x4& m) {
 
 	return tmp;
 }
-Matrix4x4 MakeIdentity4x4() {
+inline Matrix4x4 MakeIdentity4x4() {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = 1.0f;
 	tmp.m[0][1] = 0.0f;
@@ -343,7 +354,7 @@ Matrix4x4 MakeIdentity4x4() {
 
 	return tmp;
 }
-Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
+inline Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = 1;
 	tmp.m[0][1] = 0;
@@ -368,7 +379,7 @@ Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	return tmp;
 
 }
-Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
+inline Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 	Matrix4x4 tmp;
 	tmp.m[0][0] = scale.x;
 	tmp.m[0][1] = 0;
@@ -392,7 +403,7 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
 
 	return tmp;
 }
-Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+inline Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	Vector3 result;
 	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
 	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
@@ -407,7 +418,7 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	return result;
 
 }
-Matrix4x4 MakeRotateXMatrix(float radian) {
+inline Matrix4x4 MakeRotateXMatrix(float radian) {
 
 	Matrix4x4 tmp;
 
@@ -433,7 +444,7 @@ Matrix4x4 MakeRotateXMatrix(float radian) {
 
 	return tmp;
 }
-Matrix4x4 MakeRotateYMatrix(float radian) {
+inline Matrix4x4 MakeRotateYMatrix(float radian) {
 
 	Matrix4x4 tmp;
 
@@ -459,7 +470,7 @@ Matrix4x4 MakeRotateYMatrix(float radian) {
 
 	return tmp;
 }
-Matrix4x4 MakeRotateZMatrix(float radian) {
+inline Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	Matrix4x4 tmp;
 
@@ -485,7 +496,7 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	return tmp;
 }
-Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
+inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
 	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);

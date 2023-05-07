@@ -1,8 +1,14 @@
 #include "Player.h"
 #include <assert.h>
-#include "Mymath.h"
 #include <imgui.h>
 #include <algorithm>
+#include "Mymath.h"
+
+
+Player::~Player() {
+
+}
+
 /// <summary>
 /// 初期化
 /// </summary>
@@ -17,7 +23,18 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 	input_ = Input::GetInstance();
 }
 
+
+
 void Player::Update() { 
+
+	//デスフラグの立った球を削除
+	bullets_.remove_if([](std::unique_ptr<PlayerBullet>& bullet) {
+		if (bullet->IsDead()) {
+			return true;
+		}
+		return false;
+	});
+
 	//キャラクターの移動ベクトル	
 	Vector3 move = {0,0,0};
 
@@ -28,9 +45,17 @@ void Player::Update() {
 	const float kMoveLimitX = 33;
 	const float kMoveLimitY = 18;
 
+	//回転速さ[ラジアン　/  frame]
+	const float kRotSpeed = 0.02f;
+
+	//押した方向で移動ベクトルを変更
+	if (input_->PushKey(DIK_A)) {
+		worldTransform_.rotation_.y -= kRotSpeed;
+	} else if (input_->PushKey(DIK_D)) {
+		worldTransform_.rotation_.y += kRotSpeed;
+	}
 
 	worldTransform_.scale_ = Vector3{1.0f, 1.0f, 1.0f};
-	worldTransform_.rotation_ = Vector3{0.0f, 0.0f, 0.0f};
 
 	//押した方向で移動ベクトルを変更
 	if (input_->PushKey(DIK_LEFT)) {
@@ -52,10 +77,14 @@ void Player::Update() {
 	worldTransform_.translation_.y = std::clamp(
 	    worldTransform_.translation_.y, -kMoveLimitY, kMoveLimitY);
 
-	worldTransform_.matWorld_ = MakeAffineMatrix(
-	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	worldTransform_.UpdateMatrix();
+	Attack();
 
-	worldTransform_.TransferMatrix();
+	//弾更新
+	for (const std::unique_ptr<PlayerBullet>& bullet : bullets_) {
+
+		bullet->Update();
+	}
 
 	ImGui::Begin("a");
 	ImGui::Text(
@@ -63,8 +92,37 @@ void Player::Update() {
 	    worldTransform_.translation_.y, worldTransform_.translation_.z);
 	ImGui::SliderFloat3("Player.pos",&worldTransform_.translation_.x,0.0f,1.0f);
 	ImGui::End();
-
 }
+
+/// <summary>
+/// 攻撃
+/// </summary>
+void Player::Attack() {
+	if (input_->TriggerKey(DIK_SPACE)) {
+
+		//弾の速度
+		const float kBulletSpeed = 1.0f;
+		Vector3 velocity(0, 0, kBulletSpeed);
+
+		//速度ベクトルを自機の向きに合わせて回転させる
+		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+		//弾を生成、初期化
+		std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
+		newBullet->Initialize(model_, worldTransform_.translation_,velocity);
+
+		//弾を登録する
+		bullets_.push_back(std::move(newBullet));
+
+	}
+}
+
 void Player::Draw(ViewProjection& viewProjection) {
+
+	//弾描画
+	for (const std::unique_ptr<PlayerBullet>& bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
+
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }

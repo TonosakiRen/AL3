@@ -34,11 +34,21 @@ void GameScene::Initialize() {
 	AxisIndicator::GetInstance()->SetVisible(true);
 	//軸方向表示が参照するビュープロダクションを指定する（アドレス渡し）
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+
+	// 敵を生成、初期化
+	std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
+	newEnemy->Initialize(model_, {0, 5, 50});
+	// 敵を登録する
+	enemies_.push_back(std::move(newEnemy));
 }
 
 void GameScene::Update() {
 	//自キャラ更新
 	player_->Update();
+	//敵更新
+	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+		enemy->Update();
+	}
 	#ifdef _DEBUG
 	if (input_->TriggerKey(DIK_0) && isDebugCameraActive_ == false) {
 		isDebugCameraActive_ = true;
@@ -88,6 +98,10 @@ void GameScene::Draw() {
 	/// </summary>
 	// 3Dモデル描画
 	player_->Draw(viewProjection_);
+	// 敵描画
+	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+		enemy->Draw(viewProjection_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
