@@ -3,11 +3,19 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 #include <cstdint>
+#include "EnemyBullet.h"
+#include "BaseEnemyState.h"
+#include "EnemyStateApproach.h"
+#include "EnemyStateLeave.h"
+
 /// <summary>
 /// 敵
 /// </summary>
 class Enemy {
 public:
+	//発射感覚
+	static const int kFireInterval = 60;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -21,14 +29,34 @@ public:
 	void Update();
 
 	/// <summary>
+	/// 攻撃
+	/// </summary>
+	void Fire();
+
+	/// <summary>
+	/// 動く
+	/// </summary>
+	void move(Vector3 velocity);
+
+	/// <summary>
+	/// state変更
+	/// </summary>
+	void ChangeState(std::unique_ptr<BaseEnemyState> changeState);
+
+	/// <summary>
 	/// 接近
 	/// </summary>
-	void Approach();
+	/*void Approach();*/
+
+	/// <summary>
+	/// 接近初期化
+	/// </summary>
+	void FireCountInitialize();
 
 	/// <summary>
 	/// 離脱
 	/// </summary>
-	void Leave();
+	/*void Leave();*/
 
 	/// <summary>
 	/// 描画
@@ -37,18 +65,25 @@ public:
 	void Draw(const ViewProjection& viewProjection);
 
 	bool IsDead() const { return isDead_; }
+	int GetFireCount() const { return fireCount_; }
+	void SetFireCount(int fireCount) { fireCount_ = fireCount; }
+	WorldTransform GetTransforom() const { return worldTransform_; }
+	Vector3 GetApproachVelocity() const { return approachVelocity_; }
+	Vector3 GetLeaveVelocity() const { return leaveVelocity_; }
 
 private:
 
 	//行動フェーズ
-	enum class Phase {
-		Approach, //接近
-		Leave, //離脱する
-	};
+	//enum class Phase {
+	//	Approach, //接近
+	//	Leave, //離脱する
+	//};
 	//フェーズ
-	Phase phase_ = Phase::Approach;
+	/*Phase phase_ = Phase::Approach;*/
 
-	static void (Enemy::*spFuncTable[])();
+	std::unique_ptr<BaseEnemyState> state_;
+
+	/*static void (Enemy::*spFuncTable[])();*/
 
 	WorldTransform worldTransform_;
 	Model* model_;
@@ -58,4 +93,8 @@ private:
 	Vector3 leaveVelocity_ = {-0.1f,0.1f,-0.1f};
 	// デスフラグ
 	bool isDead_ = false;
+	//発射タイマー
+	int32_t fireCount_ = 0;
+	// 弾
+	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 };
