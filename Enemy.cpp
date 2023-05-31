@@ -14,22 +14,10 @@ void Enemy::Initialize(Model* model, const Vector3& position) {
 
 	worldTransform_.translation_ = position;
 
-	FireCountInitialize();
-
 	state_ = std::make_unique<EnemyStateApproach>();
+	state_->Initialize(this);
 
 }
-
-//void (Enemy::*Enemy::spFuncTable[])() = {
-//    &Enemy::Approach,
-//    &Enemy::Leave,
-//};
-
-void Enemy::FireCountInitialize() {
-	//発射タイマーを初期化
-	fireCount_ = kFireInterval;
-}
-
 
 void Enemy::Update() {
 
@@ -41,8 +29,7 @@ void Enemy::Update() {
 		return false;
 	});
 
-	/*(this->*spFuncTable[static_cast<size_t>(phase_)])();*/
-	state_->Update(this);
+	state_->Update();
 
 	worldTransform_.UpdateMatrix();
 
@@ -75,34 +62,15 @@ void Enemy::Fire() {
 	
 }
 
+
+
 void Enemy::move(Vector3 velocity) { worldTransform_.translation_ += velocity; }
 
 void Enemy::ChangeState(std::unique_ptr<BaseEnemyState> changeState) { 
-	state_ = std::move(changeState); }
+	state_ = std::move(changeState);
+	state_->Initialize(this);
+}
 
-//void Enemy::Approach() {
-//
-//	
-//	fireCount_--;
-//
-//	    if (fireCount_ <= 0) {
-//		// 弾を発射
-//		Fire();
-//		// 発射タイマーを初期化
-//		fireCount_ = kFireInterval;
-//	    }
-//
-//	// 移動(ベクトルを加算)
-//	worldTransform_.translation_ += approachVelocity_;
-//	// 既定の位置に到達したら離脱
-//	if (worldTransform_.translation_.z < 0.0f) {
-//		/*phase_ = Phase::Leave;*/
-//	}
-//}
-//void Enemy::Leave() {
-//	// 移動(ベクトルを加算)
-//	worldTransform_.translation_ += leaveVelocity_;
-//}
 void Enemy::Draw(const ViewProjection& viewProjection) {
 	// 弾描画
 	for (const std::unique_ptr<EnemyBullet>& bullet : bullets_) {

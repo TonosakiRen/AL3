@@ -44,21 +44,6 @@ public:
 	void ChangeState(std::unique_ptr<BaseEnemyState> changeState);
 
 	/// <summary>
-	/// 接近
-	/// </summary>
-	/*void Approach();*/
-
-	/// <summary>
-	/// 接近初期化
-	/// </summary>
-	void FireCountInitialize();
-
-	/// <summary>
-	/// 離脱
-	/// </summary>
-	/*void Leave();*/
-
-	/// <summary>
 	/// 描画
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
@@ -73,18 +58,7 @@ public:
 
 private:
 
-	//行動フェーズ
-	//enum class Phase {
-	//	Approach, //接近
-	//	Leave, //離脱する
-	//};
-	//フェーズ
-	/*Phase phase_ = Phase::Approach;*/
-
 	std::unique_ptr<BaseEnemyState> state_;
-
-	/*static void (Enemy::*spFuncTable[])();*/
-
 	WorldTransform worldTransform_;
 	Model* model_;
 	uint32_t textureHandle_ = 0u;

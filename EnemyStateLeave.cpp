@@ -1,4 +1,8 @@
 #include "EnemyStateLeave.h"
 #include "Enemy.h"
-void EnemyStateLeave::Update(Enemy* pEnemy) { 
-	pEnemy->move(pEnemy->GetLeaveVelocity()); }
+void EnemyStateLeave::Update() { 
+	pEnemy_->move(pEnemy_->GetLeaveVelocity()); 
+}
+void EnemyStateLeave::Initialize(Enemy* pEnemy) { 
+	pEnemy_ = pEnemy;
+}

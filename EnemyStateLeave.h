@@ -3,5 +3,6 @@
 
 class EnemyStateLeave : public BaseEnemyState {
 public:
-	void Update(Enemy* pEnemy) override;
+	void Update() override;
+	void Initialize(Enemy* pEnemy) override;
 };
