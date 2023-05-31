@@ -8,6 +8,8 @@
 #include "EnemyStateApproach.h"
 #include "EnemyStateLeave.h"
 
+class Player;
+
 /// <summary>
 /// 敵
 /// </summary>
@@ -55,6 +57,8 @@ public:
 	WorldTransform GetTransforom() const { return worldTransform_; }
 	Vector3 GetApproachVelocity() const { return approachVelocity_; }
 	Vector3 GetLeaveVelocity() const { return leaveVelocity_; }
+	void SetPlayer(Player* player) { player_ = player; }
+	
 
 private:
 
@@ -71,4 +75,6 @@ private:
 	int32_t fireCount_ = 0;
 	// 弾
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+	//自キャラ
+	Player* player_ = nullptr;
 };

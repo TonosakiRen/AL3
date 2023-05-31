@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "Mymath.h"
 #include <assert.h>
+#include "Player.h"
 
 void Enemy::Initialize(Model* model, const Vector3& position) {
 	// NULLポインタチェック
@@ -46,19 +47,27 @@ void Enemy::Update() {
 /// </summary>
 void Enemy::Fire() {
 
-		// 弾の速度
-		const float kBulletSpeed = -1.0f;
-		Vector3 velocity(0, 0, kBulletSpeed);
+	assert(player_);
 
-		// 速度ベクトルを自機の向きに合わせて回転させる
-		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+	
+	// 弾の速度
+	const float kBulletSpeed = 1.0f;
 
-		// 弾を生成、初期化
-		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+	//弾の移動量
+	Vector3 direction =
+	    Normalize(player_->GetWorldPosition() - worldTransform_.translation_) * kBulletSpeed;
 
-		// 弾を登録する
-		bullets_.push_back(std::move(newBullet));
+	Vector3 velocity(direction);
+
+	// 速度ベクトルを自機の向きに合わせて回転させる
+	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+	// 弾を生成、初期化
+	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
+	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+
+	// 弾を登録する
+	bullets_.push_back(std::move(newBullet));
 	
 }
 

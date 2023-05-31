@@ -37,9 +37,12 @@ void GameScene::Initialize() {
 
 	// 敵を生成、初期化
 	std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
+	// 敵キャラに自キャラのアドレスを渡す
+	newEnemy->SetPlayer(player_);
 	newEnemy->Initialize(model_, {0, 5, 50});
 	// 敵を登録する
 	enemies_.push_back(std::move(newEnemy));
+	
 }
 
 void GameScene::Update() {
