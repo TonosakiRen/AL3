@@ -7,6 +7,16 @@
 #include "Matrix4x4.h"
 #include <assert.h>
 
+inline float clamp(float num, float min, float max) {
+	if (num < min) {
+		return min;
+	}
+	if (num > max) {
+		return max;
+	}
+	return num;
+}
+
 #pragma region Vector3
 //Vetor3
 //加算
@@ -89,6 +99,39 @@ inline Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
 
+//線形補間
+inline Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) { 
+	Vector3 result = v1 +  (v2 - v1) * t ; 
+	return result;
+}
+//球面線形補間
+inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
+
+	const float epsilon = 0.0001f;
+
+	Vector3 a = Normalize(v1);
+	Vector3 b = Normalize(v2);
+
+	float dot = Dot(a, b);
+
+	if (std::abs(dot - 1.0f) < epsilon) {
+		return a;
+	}
+	else if (std::abs(dot + 1.0f) < epsilon) {
+		return Lerp(v1, v2, t);
+	}
+	
+	float theta = std::acos(dot);
+
+	float sinTheta = std::sin(theta);
+	float factorA = std::sin((1.0f - t) * theta) / sinTheta;
+	float factorB = std::sin(t * theta) / sinTheta;
+
+	return Vector3{
+	    factorA * a.x + factorB * b.x, factorA * a.y + factorB * b.y,
+	    factorA * a.z + factorB * b.z};
+
+}
 
 #pragma endregion
 #pragma region Matrix3x3

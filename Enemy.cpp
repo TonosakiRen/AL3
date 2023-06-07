@@ -64,7 +64,7 @@ void Enemy::Fire() {
 
 	// 弾を生成、初期化
 	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
-	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+	newBullet->Initialize(model_, worldTransform_.translation_, velocity , player_);
 
 	// 弾を登録する
 	bullets_.push_back(std::move(newBullet));
