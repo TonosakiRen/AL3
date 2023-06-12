@@ -76,38 +76,45 @@ void GameScene::Update() {
 }
 
 void GameScene::CheckAllCollision() {
-	//自弾リストの取得
-	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
-#pragma region 自キャラと敵弾の当たり判定
+	//コライダー
+	std::list<Collider*> colliders_;
+	//コライダーをリストに登録
+	colliders_.push_back(player_.get());
 	for (auto& enemy : enemies_) {
-		// 敵弾リストの取得
-		const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy->GetBullets();
-		//自キャラと敵弾すべての当たり判定
-		for (auto& enemyBullet : enemyBullets) {
-			CheckCollisionPair(player_.get(), enemyBullet.get());
-		}	
+		colliders_.push_back(enemy.get());	
 	}
-#pragma endregion
-	//自キャラの弾取得
-	for (auto& playerBullet : playerBullets) {
-		//敵キャラ取得
-		for (auto& enemy : enemies_) {
-			CheckCollisionPair(playerBullet.get(), enemy.get());
+	// 自弾すべてについて
+	for (auto& playerBullet : player_->GetBullets()) {
+		colliders_.push_back(playerBullet.get());	
+	}
+	for (auto& enemy : enemies_) {
+		// 敵弾すべてについて
+		for (auto& enemyBullet : enemy->GetBullets()) {
+			colliders_.push_back(enemyBullet.get());
 		}
 	}
 
-	//自キャラの弾取得
-	for (auto& playerBullet : playerBullets) {
-		for (auto& enemy : enemies_) {
-		  // 敵弾リストの取得
-		  const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy->GetBullets();
-		  for (auto& enemyBullet : enemyBullets) {
-			  CheckCollisionPair(enemyBullet.get(), playerBullet.get());
-		  }
+	//リスト内のペアを総当たり
+	std::list<Collider*>::iterator itrA = colliders_.begin();
+	for (; itrA != colliders_.end(); ++itrA) {
+		Collider* colliderA = *itrA;
+
+		//イテレータBはイテレータAの次の要素から回す(重複判定を回避)
+		std::list<Collider*>::iterator itrB = itrA;
+		itrB++;
+		
+		for (; itrB != colliders_.end(); ++itrB) {
+			Collider* colliderB = *itrB;
+			// 衝突フィルタリング
+			if ((colliderA->GetCollsionAttribute() & colliderB->GetCollisionMask()) == 0 || 
+				(colliderB->GetCollsionAttribute() & colliderA->GetCollisionMask()) == 0) {
+				continue;
+			}
+			//ペアの当たり判定
+			CheckCollisionPair(colliderA, colliderB);
 		}
 	}
 
-	
 }
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {

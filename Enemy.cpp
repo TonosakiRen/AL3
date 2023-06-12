@@ -2,6 +2,7 @@
 #include "Mymath.h"
 #include <assert.h>
 #include "Player.h"
+#include "CollisionConfig.h"
 
 void Enemy::Initialize(Model* model, const Vector3& position) {
 	// NULLポインタチェック
@@ -17,6 +18,11 @@ void Enemy::Initialize(Model* model, const Vector3& position) {
 
 	state_ = std::make_unique<EnemyStateApproach>();
 	state_->Initialize(this);
+
+	// 衝突属性を設定
+	SetCollisionAttribute(kCollisionAttributeEnemy);
+	// 衝突対象を自分の属性以外に設定
+	SetCollisionMask(~kCollisionAttributeEnemy);
 
 }
 
