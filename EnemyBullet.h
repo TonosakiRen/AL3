@@ -3,13 +3,14 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <cstdint>
+#include "Collider.h"
 
 class Player;
 
 /// <summary>
 /// 自キャラの玉
 /// </summary>
-class EnemyBullet {
+class EnemyBullet : public Collider {
 public:
 	/// <summary>
 	/// 初期化
@@ -24,7 +25,7 @@ public:
 	void Update();
 
 	// 衝突したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	/// <summary>
 	/// 描画
@@ -34,7 +35,7 @@ public:
 
 	bool IsDead() const { return isDead_; }
 	void SetPlayer(Player* player) { player_ = player; }
-	Vector3 GetWorldPosition() { return worldTransform_.translation_; }
+	Vector3 GetWorldPosition() override { return worldTransform_.translation_; }
 	float GetRadius() const { return radius_; }
 
 private:

@@ -130,11 +130,3 @@ void Player::Draw(ViewProjection& viewProjection) {
 
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }
-
-Vector3 Player::GetWorldPosition() { 
-	//ワールド座標を入れる
-	Vector3 worldPos;
-	//ワールド行列の変更移動成分を取得(ワールド座標)
-	worldPos = worldTransform_.translation_;
-	return worldPos;
-}

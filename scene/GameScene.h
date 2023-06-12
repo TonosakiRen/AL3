@@ -44,6 +44,13 @@ public: // メンバ関数
 	/// </summary>
 	void CheckAllCollision();
 
+	/// <summary>
+	/// コライダー２つの衝突判定と応答
+	/// </summary>
+	/// <param name="colliderA">コライダーA</param>
+	/// <param name="colliderB">コライダーB</param>
+	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
+
 
 	/// <summary>
 	/// 描画
@@ -63,7 +70,7 @@ private: // メンバ変数
 	ViewProjection viewProjection_;
 
 	//自キャラ
-	Player* player_ = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
 
 	//デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;

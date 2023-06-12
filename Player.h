@@ -6,10 +6,11 @@
 #include <Input.h>
 #include "PlayerBullet.h"
 #include <list>
+#include "Collider.h"
 /// <summary>
 /// 自キャラ
 /// </summary>
-class Player {
+class Player : public Collider{
 public:
 
 
@@ -36,7 +37,7 @@ public:
 	void Attack();
 
 	//衝突したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	//弾リストを取得
 	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
@@ -48,8 +49,7 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 	//ワールド座標を取得
-	Vector3 GetWorldPosition();
-	float GetRadius() const { return radius_; }
+	Vector3 GetWorldPosition() override { return worldTransform_.translation_; }
 
 private:
 	// ワールド変換データ

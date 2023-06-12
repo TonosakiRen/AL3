@@ -13,7 +13,7 @@ class Player;
 /// <summary>
 /// 敵
 /// </summary>
-class Enemy {
+class Enemy : public Collider{
 public:
 	//発射感覚
 	static const int kFireInterval = 60;
@@ -46,7 +46,7 @@ public:
 	void ChangeState(std::unique_ptr<BaseEnemyState> changeState);
 
 	//衝突したら呼び出されるコールバック関数
-	void OnCollision();
+	void OnCollision() override;
 
 	// 弾リストを取得
 	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
@@ -66,7 +66,7 @@ public:
 	Vector3 GetLeaveVelocity() const { return leaveVelocity_; }
 	void SetPlayer(Player* player) { player_ = player; }
 	float GetRadius() const { return radius_; }
-	Vector3 GetWorldPosition() { return worldTransform_.translation_; }
+	Vector3 GetWorldPosition() override { return worldTransform_.translation_; }
 
 private:
 
