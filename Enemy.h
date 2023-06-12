@@ -45,6 +45,13 @@ public:
 	/// </summary>
 	void ChangeState(std::unique_ptr<BaseEnemyState> changeState);
 
+	//衝突したら呼び出されるコールバック関数
+	void OnCollision();
+
+	// 弾リストを取得
+	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
+	
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -58,7 +65,8 @@ public:
 	Vector3 GetApproachVelocity() const { return approachVelocity_; }
 	Vector3 GetLeaveVelocity() const { return leaveVelocity_; }
 	void SetPlayer(Player* player) { player_ = player; }
-	
+	float GetRadius() const { return radius_; }
+	Vector3 GetWorldPosition() { return worldTransform_.translation_; }
 
 private:
 
@@ -77,4 +85,6 @@ private:
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	//自キャラ
 	Player* player_ = nullptr;
+	// 当たり判定
+	const float radius_ = 1.0f;
 };

@@ -23,6 +23,9 @@ public:
 	/// </summary>
 	void Update();
 
+	// 衝突したら呼び出されるコールバック関数
+	void OnCollision();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -31,6 +34,8 @@ public:
 
 	bool IsDead() const { return isDead_; }
 	void SetPlayer(Player* player) { player_ = player; }
+	Vector3 GetWorldPosition() { return worldTransform_.translation_; }
+	float GetRadius() const { return radius_; }
 
 private:
 	WorldTransform worldTransform_;
@@ -46,4 +51,6 @@ private:
 	bool isDead_ = false;
 	//プレイヤーポインタ
 	Player* player_;
+	// 当たり判定
+	const float radius_ = 1.0f;
 };

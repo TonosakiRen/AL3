@@ -35,6 +35,12 @@ public:
 	/// </summary>
 	void Attack();
 
+	//衝突したら呼び出されるコールバック関数
+	void OnCollision();
+
+	//弾リストを取得
+	const std::list<std::unique_ptr<PlayerBullet>>& GetBullets() { return bullets_; }
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -43,6 +49,7 @@ public:
 
 	//ワールド座標を取得
 	Vector3 GetWorldPosition();
+	float GetRadius() const { return radius_; }
 
 private:
 	// ワールド変換データ
@@ -55,5 +62,7 @@ private:
 	Input* input_ = nullptr;
 	// 弾
 	std::list < std::unique_ptr<PlayerBullet>> bullets_;
+	//当たり判定
+	const float radius_ = 1.0f;
 
 };

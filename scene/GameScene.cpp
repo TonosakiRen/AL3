@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include "AxisIndicator.h"
+#include "Mymath.h"
 
 GameScene::GameScene() {}
 
@@ -59,6 +60,8 @@ void GameScene::Update() {
 	if (input_->TriggerKey(DIK_0) && isDebugCameraActive_ == true) {
 		isDebugCameraActive_ = false;
 	}
+	//当たり判定
+	CheckAllCollision();
 	#endif
 	//カメラの処理
 	if (isDebugCameraActive_) {
@@ -68,6 +71,70 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	} else {
 		viewProjection_.UpdateMatrix();
+	}
+
+	
+}
+
+void GameScene::CheckAllCollision() {
+	//判定対象AとBの座標
+	Vector3 posA, posB;
+
+	//自弾リストの取得
+	const std::list<std::unique_ptr<PlayerBullet>>& playerBullets = player_->GetBullets();
+	// 自キャラの座標
+	posA = player_->GetWorldPosition();
+#pragma region 自キャラと敵弾の当たり判定
+	for (auto& enemy : enemies_) {
+		// 敵弾リストの取得
+		const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy->GetBullets();
+		//自キャラと敵弾すべての当たり判定
+		for (auto& enemyBullet : enemyBullets) {
+		  //敵弾の座標
+		  posB = enemyBullet->GetWorldPosition();
+		  float distance = Length(posA - posB);
+		  if (distance <= enemyBullet->GetRadius() + player_->GetRadius()) {
+			//自キャラの衝突時コールバックを呼び出す
+			  player_->OnCollision();
+			 //敵弾の衝突時コールバックを呼び出す	
+			  enemyBullet->OnCollision();
+		  }
+		}	
+	}
+#pragma endregion
+	//自キャラの弾取得
+	for (auto& playerBullet : playerBullets) {
+		//敵キャラ取得
+		for (auto& enemy : enemies_) {
+		  posA = enemy->GetWorldPosition();
+		  posB = playerBullet->GetWorldPosition();
+		  float distance = Length(posA - posB);
+		  //自弾と敵の当たり判定
+		  if (distance <= enemy->GetRadius() + playerBullet->GetRadius()) {
+			//自弾のコールバックを呼び出す	
+			  enemy->OnCollision();
+ 			  playerBullet->OnCollision();
+		  }
+		}
+	}
+
+	//自キャラの弾取得
+	for (auto& playerBullet : playerBullets) {
+		for (auto& enemy : enemies_) {
+		  // 敵弾リストの取得
+		  const std::list<std::unique_ptr<EnemyBullet>>& enemyBullets = enemy->GetBullets();
+		  for (auto& enemyBullet : enemyBullets) {
+			  posA = enemyBullet->GetWorldPosition();
+			  posB = playerBullet->GetWorldPosition();
+			  float distance = Length(posA - posB);
+			  //自弾と敵弾の当たり判定
+			  if (distance <= enemyBullet->GetRadius() + playerBullet->GetRadius()) {
+				  // 自弾のコールバックを呼び出す
+				  enemyBullet->OnCollision();
+				  playerBullet->OnCollision();
+			  }
+		  }
+		}
 	}
 
 	

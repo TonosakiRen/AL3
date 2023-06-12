@@ -71,7 +71,9 @@ void Enemy::Fire() {
 	
 }
 
-
+void Enemy::OnCollision() {
+	// 何もしない
+}
 
 void Enemy::move(Vector3 velocity) { worldTransform_.translation_ += velocity; }
 

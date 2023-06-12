@@ -40,6 +40,12 @@ public: // メンバ関数
 	void Update();
 
 	/// <summary>
+	/// 衝突判定と応答
+	/// </summary>
+	void CheckAllCollision();
+
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();

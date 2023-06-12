@@ -21,6 +21,9 @@ public:
 	/// </summary>
 	void Update();
 
+	// 衝突したら呼び出されるコールバック関数
+	void OnCollision();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -28,6 +31,9 @@ public:
 	void Draw(const ViewProjection& viewProjection);
 
 	bool IsDead() const { return isDead_; }
+	float GetRadius() const { return radius_; }
+	Vector3 GetWorldPosition() { return worldTransform_.translation_; }
+
 
 	private:
 	WorldTransform worldTransform_;
@@ -41,4 +47,6 @@ public:
 	int32_t deathTimer_ = kLifeTime;
 	//デスフラグ
 	bool isDead_ = false;
+	// 当たり判定
+	const float radius_ = 1.0f;
 };

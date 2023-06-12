@@ -57,6 +57,9 @@ void EnemyBullet::Update() {
 		isDead_ = true;
 	}
 }
+
+void EnemyBullet::OnCollision() { isDead_ = true; }
+
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {
 
 	// モデル描画

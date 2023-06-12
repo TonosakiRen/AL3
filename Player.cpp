@@ -39,7 +39,7 @@ void Player::Update() {
 	Vector3 move = {0,0,0};
 
 	//キャラクターの移動速さ
-	const float kCharacterSpeed = 2.0f;
+	const float kCharacterSpeed = 0.2f;
 
 	//移動限界座標
 	const float kMoveLimitX = 33;
@@ -115,6 +115,10 @@ void Player::Attack() {
 		bullets_.push_back(std::move(newBullet));
 
 	}
+}
+
+void Player::OnCollision() {
+	//何もしない
 }
 
 void Player::Draw(ViewProjection& viewProjection) {
