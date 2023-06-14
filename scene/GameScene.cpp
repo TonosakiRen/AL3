@@ -42,6 +42,9 @@ void GameScene::Initialize() {
 	newEnemy->Initialize(model_, {0, 5, 50});
 	// 敵を登録する
 	enemies_.push_back(std::move(newEnemy));
+
+	//CollisionManagerを生成する
+	collisionManager_ = std::make_unique<CollisionManager>();
 	
 }
 
@@ -76,8 +79,12 @@ void GameScene::Update() {
 }
 
 void GameScene::CheckAllCollision() {
+
+	//collisionManagerのcolliderをクリア
+	collisionManager_->ClearColliders();
+
 	//コライダー
-	std::list<Collider*> colliders_;
+	std::vector<Collider*> colliders_;
 	//コライダーをリストに登録
 	colliders_.push_back(player_.get());
 	for (auto& enemy : enemies_) {
@@ -94,40 +101,8 @@ void GameScene::CheckAllCollision() {
 		}
 	}
 
-	//リスト内のペアを総当たり
-	std::list<Collider*>::iterator itrA = colliders_.begin();
-	for (; itrA != colliders_.end(); ++itrA) {
-		Collider* colliderA = *itrA;
-
-		//イテレータBはイテレータAの次の要素から回す(重複判定を回避)
-		std::list<Collider*>::iterator itrB = itrA;
-		itrB++;
-		
-		for (; itrB != colliders_.end(); ++itrB) {
-			Collider* colliderB = *itrB;
-			// 衝突フィルタリング
-			if ((colliderA->GetCollsionAttribute() & colliderB->GetCollisionMask()) == 0 || 
-				(colliderB->GetCollsionAttribute() & colliderA->GetCollisionMask()) == 0) {
-				continue;
-			}
-			//ペアの当たり判定
-			CheckCollisionPair(colliderA, colliderB);
-		}
-	}
-
-}
-
-void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
-	Vector3 posA = colliderA->GetWorldPosition();
-	Vector3 posB = colliderB->GetWorldPosition();
-	float distance = Length(posA - posB);
-	//球と球の交差判定
-	if (distance <= colliderA->GetRadius() + colliderB->GetRadius()) {
-		//コライダーAの衝突時コールバックを呼び出す
-		colliderA->OnCollision();
-		//コライダーBの衝突時コールバックを呼び出す
-		colliderB->OnCollision();
-	}
+	collisionManager_->SetColliders(colliders_);
+	collisionManager_->CheckAllCollision();
 
 }
 

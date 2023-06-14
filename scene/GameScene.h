@@ -12,6 +12,7 @@
 #include "DebugCamera.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "CollisionManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -45,14 +46,6 @@ public: // メンバ関数
 	void CheckAllCollision();
 
 	/// <summary>
-	/// コライダー２つの衝突判定と応答
-	/// </summary>
-	/// <param name="colliderA">コライダーA</param>
-	/// <param name="colliderB">コライダーB</param>
-	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
-
-
-	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();
@@ -78,6 +71,9 @@ private: // メンバ変数
 
 	//Enemy
 	std::list<std::unique_ptr<Enemy>> enemies_;
+
+	//CollsiionManager
+	std::unique_ptr<CollisionManager> collisionManager_;
 
 	/// <summary>
 	/// ゲームシーン用
