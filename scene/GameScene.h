@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "CollisionManager.h"
+#include "Skydome.h"
 
 /// <summary>
 /// ゲームシーン
@@ -74,6 +75,11 @@ private: // メンバ変数
 
 	//CollsiionManager
 	std::unique_ptr<CollisionManager> collisionManager_;
+
+	//Skydome
+	std::unique_ptr<Skydome> skydome_;
+	//3Dモデル
+	Model* modelSkydome_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用

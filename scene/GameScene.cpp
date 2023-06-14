@@ -8,6 +8,7 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete model_;
+	delete modelSkydome_;
 	delete debugCamera_;
 }
 
@@ -45,7 +46,12 @@ void GameScene::Initialize() {
 
 	//CollisionManagerを生成する
 	collisionManager_ = std::make_unique<CollisionManager>();
-	
+
+	//skydomeを生成する
+	skydome_ = std::make_unique<Skydome>();
+	//3Dモデルの生成
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+	skydome_->Initialize(modelSkydome_);
 }
 
 void GameScene::Update() {
@@ -133,6 +139,9 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	// 3Dモデル描画
+
+	skydome_->Draw(viewProjection_);
+
 	player_->Draw(viewProjection_);
 	// 敵描画
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
