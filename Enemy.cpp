@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "Player.h"
 #include "CollisionConfig.h"
+#include "GameScene.h"
 
 void Enemy::Initialize(Model* model, const Vector3& position) {
 	// NULLポインタチェック
@@ -23,28 +24,14 @@ void Enemy::Initialize(Model* model, const Vector3& position) {
 	SetCollisionAttribute(kCollisionAttributeEnemy);
 	// 衝突対象を自分の属性以外に設定
 	SetCollisionMask(~kCollisionAttributeEnemy);
-
 }
 
 void Enemy::Update() {
 
-	// デスフラグの立った弾を削除
-	bullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
-		if (bullet->IsDead()) {
-			return true;
-		}
-		return false;
-	});
 
 	state_->Update();
 
 	worldTransform_.UpdateMatrix();
-
-	// 弾更新
-	for (const std::unique_ptr<EnemyBullet>& bullet : bullets_) {
-
-		bullet->Update();
-	}
 
 }
 
@@ -73,13 +60,11 @@ void Enemy::Fire() {
 	newBullet->Initialize(model_, worldTransform_.translation_, velocity , player_);
 
 	// 弾を登録する
-	bullets_.push_back(std::move(newBullet));
+	gameScene_->AddEnemybullet(std::move(newBullet));
 	
 }
 
-void Enemy::OnCollision() {
-	// 何もしない
-}
+void Enemy::OnCollision() { isDead_ = true; }
 
 void Enemy::move(Vector3 velocity) { worldTransform_.translation_ += velocity; }
 
@@ -89,10 +74,6 @@ void Enemy::ChangeState(std::unique_ptr<BaseEnemyState> changeState) {
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection) {
-	// 弾描画
-	for (const std::unique_ptr<EnemyBullet>& bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}
 	// モデル描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }

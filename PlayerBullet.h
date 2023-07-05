@@ -34,7 +34,7 @@ public:
 	bool IsDead() const { return isDead_; }
 	float GetRadius() const { return radius_; }
 	Vector3 GetWorldPosition() override { return worldTransform_.translation_; }
-
+	void SetParent(const WorldTransform* parent) { worldTransform_.parent_ = parent; }
 
 	private:
 	WorldTransform worldTransform_;

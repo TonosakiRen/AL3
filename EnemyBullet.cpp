@@ -21,9 +21,9 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	worldTransform_.scale_.z = 3.0f;
 
 	//Y軸周り角度(θy)
-	worldTransform_.rotation_.y = std::atan2(velocity_.z, velocity_.x);
+	worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
 	
-	Matrix4x4 tmp = MakeRotateYMatrix(-std::atan2(velocity_.z, velocity_.x));
+	Matrix4x4 tmp = MakeRotateYMatrix(-std::atan2(velocity_.x, velocity_.x));
 	Vector3 velocityZ = Transform(velocity_, tmp);
 
 	worldTransform_.rotation_.x = std::atan2(-velocityZ.y, velocityZ.z);

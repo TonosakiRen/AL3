@@ -9,6 +9,7 @@
 #include "EnemyStateLeave.h"
 
 class Player;
+class GameScene;
 
 /// <summary>
 /// 敵
@@ -47,9 +48,6 @@ public:
 
 	//衝突したら呼び出されるコールバック関数
 	void OnCollision() override;
-
-	// 弾リストを取得
-	const std::list<std::unique_ptr<EnemyBullet>>& GetBullets() { return bullets_; }
 	
 
 	/// <summary>
@@ -67,6 +65,7 @@ public:
 	void SetPlayer(Player* player) { player_ = player; }
 	float GetRadius() const { return radius_; }
 	Vector3 GetWorldPosition() override { return worldTransform_.translation_; }
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 private:
 
@@ -81,10 +80,10 @@ private:
 	bool isDead_ = false;
 	//発射タイマー
 	int32_t fireCount_ = 0;
-	// 弾
-	std::list<std::unique_ptr<EnemyBullet>> bullets_;
 	//自キャラ
 	Player* player_ = nullptr;
 	// 当たり判定
 	const float radius_ = 1.0f;
+	//ゲームシーン
+	GameScene* gameScene_ = nullptr;
 };

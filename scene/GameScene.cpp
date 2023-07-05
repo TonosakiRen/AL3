@@ -3,6 +3,9 @@
 #include <cassert>
 #include "AxisIndicator.h"
 #include "Mymath.h"
+#include "PrimitiveDrawer.h"
+#include "ImGuiManager.h"
+#include <fstream>
 
 GameScene::GameScene() {}
 
@@ -19,31 +22,35 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("neko.jpg");
+	// れてぃくるのテクスチャ
+	TextureManager::Load("reticle.png");
 	// 3Dモデル生成
 	model_ = Model::Create();
 	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
-	//自キャラの設定
-	player_ = std::make_unique<Player>();
-	player_->Initialize(model_,textureHandle_);
 
 	debugCamera_ =
 	    new DebugCamera(dxCommon_->GetBackBufferWidth(), dxCommon_->GetBackBufferHeight());
 	isDebugCameraActive_ = false;
 
-	//軸方向表示の表示を有効にする	
+	// 軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
-	//軸方向表示が参照するビュープロダクションを指定する（アドレス渡し）
+	// 軸方向表示が参照するビュープロダクションを指定する（アドレス渡し）
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
-	// 敵を生成、初期化
-	std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
-	// 敵キャラに自キャラのアドレスを渡す
-	newEnemy->SetPlayer(player_.get());
-	newEnemy->Initialize(model_, {0, 5, 50});
-	// 敵を登録する
-	enemies_.push_back(std::move(newEnemy));
-
+	//ライン描画が参照するビュープロジェクションを指定する
+	PrimitiveDrawer::GetInstance()->SetViewProjection(&viewProjection_);
+	// railCamera
+	railCamera_ = std::make_unique<RailCamera>();
+	railCamera_->Initialize(viewProjection_.translation_, viewProjection_.rotation_);
+	//自キャラの設定
+	player_ = std::make_unique<Player>();
+	Vector3 playerPosition(0.0f, 0.0f, 30.0f);
+	player_->Initialize(model_, textureHandle_, playerPosition);
+	//自キャラとレールカメラの親子関係を結ぶ
+	player_->SetParent(&railCamera_->GetWorldTransform());
+	//敵生成csvをロード
+	LoadEenemyPopData();
 	//CollisionManagerを生成する
 	collisionManager_ = std::make_unique<CollisionManager>();
 
@@ -52,14 +59,42 @@ void GameScene::Initialize() {
 	//3Dモデルの生成
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_->Initialize(modelSkydome_);
+
 }
 
 void GameScene::Update() {
+
 	//自キャラ更新
-	player_->Update();
+	player_->Update(viewProjection_);
+
+	//敵生成
+	UpdateEnemyPopCommands();
+	
+	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+
+		enemy->SetGameScene(this);
+	}
 	//敵更新
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
 		enemy->Update();
+	}
+	// デスフラグの立った敵を削除
+	enemies_.remove_if([](std::unique_ptr<Enemy>& enemy) {
+		if (enemy->IsDead()) {
+			return true;
+		}
+		return false;
+	});
+	// デスフラグの立った敵弾を削除
+	enemyBullets_.remove_if([](std::unique_ptr<EnemyBullet>& bullet) {
+		if (bullet->IsDead()) {
+			return true;
+		}
+		return false;
+	});
+	// 敵弾更新
+	for (const std::unique_ptr<EnemyBullet>& enemyBullet : enemyBullets_) {
+		enemyBullet->Update();
 	}
 	#ifdef _DEBUG
 	if (input_->TriggerKey(DIK_0) && isDebugCameraActive_ == false) {
@@ -78,7 +113,10 @@ void GameScene::Update() {
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
 	} else {
-		viewProjection_.UpdateMatrix();
+		railCamera_->Update();
+		viewProjection_.matView = railCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
 	}
 
 	
@@ -100,17 +138,107 @@ void GameScene::CheckAllCollision() {
 	for (auto& playerBullet : player_->GetBullets()) {
 		colliders_.push_back(playerBullet.get());	
 	}
-	for (auto& enemy : enemies_) {
-		// 敵弾すべてについて
-		for (auto& enemyBullet : enemy->GetBullets()) {
-			colliders_.push_back(enemyBullet.get());
-		}
+	// 敵弾すべてについて
+	for (auto& enemyBullet : enemyBullets_) {
+		colliders_.push_back(enemyBullet.get());
 	}
+	
 
 	collisionManager_->SetColliders(colliders_);
 	collisionManager_->CheckAllCollision();
 
 }
+
+void GameScene::AddEnemybullet(std::unique_ptr<EnemyBullet> enemyBullet) {
+	// リストに追加する
+	enemyBullets_.emplace_back(std::move(enemyBullet));
+}
+
+void GameScene::LoadEenemyPopData() {
+
+	//fileを開く
+	std::ifstream file;
+	file.open("./Resources/enemyPop.csv");
+	assert(file.is_open());
+
+	//ファイルの内容を文字列ストリームにコピー
+	enemyPopCommands << file.rdbuf();
+
+	//ファイルを閉じる
+	file.close();
+}
+
+void GameScene::UpdateEnemyPopCommands() {
+	//待機処理
+	if (waitFlag == true) {
+
+		waitTimer--;
+	
+		if (waitTimer <= 0) {
+			//待機官僚	
+			waitFlag = false;
+		}
+		return;
+	}
+
+
+	//１行分の文字列を入れる変数
+	std::string line;
+
+	//コマンド実行ループ
+	while (getline(enemyPopCommands, line)) {
+	// １行分の文字列をストリームに変換して解析しやすくする
+		std::istringstream line_stream(line);
+		std::string word;
+		//,区切りで行の先頭文字列を取得
+		getline(line_stream, word, ',');
+		//"//"から始まる行はコメント
+		if (word.find("//") == 0) {
+			continue;
+		}
+
+		//POPコマンド
+		if (word.find("POP") == 0) {
+			//x座標
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			//y座標
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			// y座標
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			//敵を発生させる
+			EnemySpawn(Vector3(x,y,z));
+		} else if (word.find("WAIT") == 0) {
+			getline(line_stream, word, ',');
+
+			//待ち時間
+			int32_t waitTime = atoi(word.c_str());
+			//待機開始
+			waitFlag = true;
+			waitTimer = waitTime;
+
+			//コマンドループを抜ける
+			break;
+		}
+	}
+}
+
+void GameScene::EnemySpawn(Vector3 position) {
+	// 敵を生成、初期化
+	std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
+	// 敵キャラに自キャラのアドレスを渡す
+	newEnemy->SetPlayer(player_.get());
+	newEnemy->SetGameScene(this);
+	newEnemy->Initialize(model_, position);
+	// 敵を登録する
+	enemies_.push_back(std::move(newEnemy));
+}
+
 
 void GameScene::Draw() {
 
@@ -139,7 +267,7 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	// 3Dモデル描画
-
+	
 	skydome_->Draw(viewProjection_);
 
 	player_->Draw(viewProjection_);
@@ -147,6 +275,11 @@ void GameScene::Draw() {
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
 		enemy->Draw(viewProjection_);
 	}
+	//敵弾描画
+	for (const std::unique_ptr<EnemyBullet>& enemyBullet : enemyBullets_) {
+		enemyBullet->Draw(viewProjection_);
+	}
+	railCamera_->Draw();
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -155,6 +288,8 @@ void GameScene::Draw() {
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
+
+	player_->DrawUI();
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる

@@ -133,6 +133,7 @@ inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
 
 }
 
+
 #pragma endregion
 #pragma region Matrix3x3
 inline Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
@@ -461,6 +462,22 @@ inline Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
 	return result;
 
 }
+inline Vector3 operator*(const Vector3& v, const Matrix4x4& m) {
+	Vector3 result;
+	result.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + 1.0f * m.m[3][0];
+	result.y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + 1.0f * m.m[3][1];
+	result.z = v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] + 1.0f * m.m[3][2];
+	float w = v.x * m.m[0][3] + v.y * m.m[1][3] + v.z * m.m[2][3] + 1.0f * m.m[3][3];
+
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
+
+	return result;
+}
+
+
 inline Matrix4x4 MakeRotateXMatrix(float radian) {
 
 	Matrix4x4 tmp;
@@ -552,7 +569,8 @@ inline Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, c
 }
 
 inline Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2) {
-	Matrix4x4 tmp;
+	m1 = m1 * m2;
+	/*Matrix4x4 tmp;
 	tmp.m[0][0] = m1.m[0][0] * m2.m[0][0] + m1.m[0][1] * m2.m[1][0] + m1.m[0][2] * m2.m[2][0] +
 	              m1.m[0][3] * m2.m[3][0];
 	tmp.m[0][1] = m1.m[0][0] * m2.m[0][1] + m1.m[0][1] * m2.m[1][1] + m1.m[0][2] * m2.m[2][1] +
@@ -588,8 +606,42 @@ inline Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2) {
 	              m1.m[3][3] * m2.m[3][2];
 	tmp.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] +
 	              m1.m[3][3] * m2.m[3][3];
-	m1 = tmp;
+	m1 = tmp;*/
 	return m1;
 }
+// 向いてるベクトル角度
+inline Vector3 LookAtOfEulerAngle(Vector3 v1) {
+	Vector3 result = {0.0f,0.0f,0.0f};
+	v1 = Normalize(v1);
+	result.y = std::atan2(v1.x, v1.z);
+	Matrix4x4 tmp = MakeRotateYMatrix(-std::atan2(v1.x, v1.z));
+	Vector3 velocityZ = Transform(v1, tmp);
+	result.x = std::atan2(-velocityZ.y, velocityZ.z);
+	return result;
+}
+
+// ビューポート変換行列
+inline Matrix4x4 MakeViewportMatrix(
+    float left, float top, float width, float height, float minDepth, float maxDepth) {
+	Matrix4x4 tmp;
+	tmp.m[0][0] = width / 2.0f;
+	tmp.m[0][1] = 0;
+	tmp.m[0][2] = 0;
+	tmp.m[0][3] = 0;
+	tmp.m[1][0] = 0;
+	tmp.m[1][1] = -height / 2.0f;
+	tmp.m[1][2] = 0;
+	tmp.m[1][3] = 0;
+	tmp.m[2][0] = 0;
+	tmp.m[2][1] = 0;
+	tmp.m[2][2] = maxDepth - minDepth;
+	tmp.m[2][3] = 0;
+	tmp.m[3][0] = left + (width / 2.0f);
+	tmp.m[3][1] = top + (height / 2.0f);
+	tmp.m[3][2] = minDepth;
+	tmp.m[3][3] = 1;
+	return tmp;
+}
+
 #pragma endregion
 
