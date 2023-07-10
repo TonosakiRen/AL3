@@ -4,7 +4,7 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { delete model_; }
+GameScene::~GameScene() {}
 
 void GameScene::Initialize() {
 
@@ -18,8 +18,8 @@ void GameScene::Initialize() {
 	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 	//自キャラの設定
-	player_ = new Player();
-	player_->Initialize(model_,textureHandle_);
+	player_ = std::make_unique<Player>();
+	player_->Initialize(model_.get(),textureHandle_);
 
 }
 
