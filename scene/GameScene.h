@@ -11,6 +11,7 @@
 #include "memory"
 
 #include "Player.h"
+#include "Skydome.h"
 
 /// <summary>
 /// ゲームシーン
@@ -57,6 +58,11 @@ private: // メンバ変数
 
 	//自キャラ
 	std::unique_ptr<Player> player_ = nullptr;
+
+	//天空
+	std::unique_ptr<Skydome> skydome_ = nullptr;
+	//3DModel
+	std::unique_ptr<Model> modelSkydome_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用

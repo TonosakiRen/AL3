@@ -14,13 +14,17 @@ void GameScene::Initialize() {
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("neko.jpg");
 	// 3Dモデル生成
-	model_ = Model::Create();
+	model_.reset(Model::Create());
 	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 	//自キャラの設定
 	player_ = std::make_unique<Player>();
 	player_->Initialize(model_.get(),textureHandle_);
-
+	//skydomeを生成
+	skydome_ = std::make_unique<Skydome>();
+	//3Dモデルの生成
+	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
+	skydome_->Initialize(modelSkydome_.get());
 }
 
 void GameScene::Update() {
@@ -55,6 +59,8 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	// 3Dモデル描画
+	skydome_->Draw(viewProjection_);
+
 	player_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
