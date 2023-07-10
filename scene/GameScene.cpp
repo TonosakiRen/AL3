@@ -17,6 +17,9 @@ void GameScene::Initialize() {
 	model_.reset(Model::Create());
 	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
+	//デバッグカメラ
+	debugCamera_ = new DebugCamera(dxCommon_->GetBackBufferWidth(), dxCommon_->GetBackBufferHeight());
+	isDebugCameraActive_ = false;
 	//自キャラの設定
 	player_ = std::make_unique<Player>();
 	player_->Initialize(model_.get(),textureHandle_);
@@ -25,11 +28,32 @@ void GameScene::Initialize() {
 	//3Dモデルの生成
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
 	skydome_->Initialize(modelSkydome_.get());
+
+	// groundを生成
+	ground_ = std::make_unique<Ground>();
+	// 3Dモデルの生成
+	modelGround_.reset(Model::CreateFromOBJ("ground", true));
+	ground_->Initialize(modelGround_.get());
+
 }
 
 void GameScene::Update() {
+#ifdef _DEBUG
+	if (input_->TriggerKey(DIK_0) && isDebugCameraActive_ == false) {
+		isDebugCameraActive_ = true;
+	} else if (input_->TriggerKey(DIK_0) && isDebugCameraActive_ == true) {
+		isDebugCameraActive_ = false;
+	}
+#endif
 	//自キャラ更新
 	player_->Update();
+	// カメラの処理
+	if (isDebugCameraActive_) {
+		debugCamera_->Update();
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	}
 }
 
 void GameScene::Draw() {
@@ -60,6 +84,7 @@ void GameScene::Draw() {
 	/// </summary>
 	// 3Dモデル描画
 	skydome_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 
 	player_->Draw(viewProjection_);
 
