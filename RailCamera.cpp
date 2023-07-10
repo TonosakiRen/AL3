@@ -27,7 +27,7 @@ void RailCamera::Initialize(Vector3& tranlation, Vector3& rotation) {
 /// </summary>
 void RailCamera::Update() {
 	const uint32_t kTargetDiffCount = 50;
-	frame++;
+	//frame++;
 	if (frame == catmullRomSpline_.segmentCount) {
 		frame = 0;
 	}
