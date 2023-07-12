@@ -14,10 +14,17 @@ void RailCamera::Initialize(Vector3& tranlation, Vector3& rotation) {
 	viewProjection_.Initialize();
 
 	std::vector<Vector3> controlPoints_;
-	controlPoints_ = {
-	    {0.0f,  0.0f,  0.0f }, 
-		 {0.0f, 0.0f, 1.0f}, 
-	};
+	const int numPoints = 50;
+	const float radius = 10.0f;
+	for (int i = 0; i < numPoints ; i++) {
+		float angle = 2 * float(M_PI) * i / numPoints;
+		Vector3 point;
+		point.x = radius * cos(angle); 
+		point.y = 0.0f;
+		point.z = radius * sin(angle); 
+		controlPoints_.push_back(point);
+	}
+	controlPoints_.push_back(controlPoints_.front());
 	catmullRomSpline_.Initialize(controlPoints_);
 	frame = 0;
 }
@@ -27,13 +34,13 @@ void RailCamera::Initialize(Vector3& tranlation, Vector3& rotation) {
 /// </summary>
 void RailCamera::Update() {
 	const uint32_t kTargetDiffCount = 50;
-	//frame++;
+	frame++;
 	if (frame == catmullRomSpline_.segmentCount) {
 		frame = 0;
 	}
 	uint32_t targetFrame = frame + kTargetDiffCount;
 	if (frame + kTargetDiffCount >= catmullRomSpline_.segmentCount) {
-		targetFrame = targetFrame - frame;
+		targetFrame = targetFrame - uint32_t(catmullRomSpline_.segmentCount);
 	}
 	target = catmullRomSpline_.points_[targetFrame];
 	worldTransform_.translation_ = catmullRomSpline_.points_[frame];

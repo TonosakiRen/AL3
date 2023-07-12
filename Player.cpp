@@ -226,11 +226,11 @@ void Player::Attack() {
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			// 弾の速度
 			const float kBulletSpeed = 1.0f;
-			Vector3 velocity = worldTransform3DReticle_.translation_ - worldTransform_.translation_;
+			Vector3 velocity = worldTransform3DReticle_.translation_ - GetWorldPosition();
 			velocity = Normalize(velocity) * kBulletSpeed;
 
 			// 速度ベクトルを自機の向きに合わせて回転させる
-			velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+			/*velocity = TransformNormal(velocity, worldTransform_.matWorld_);*/
 
 			// 弾を生成、初期化
 			std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
@@ -244,11 +244,11 @@ void Player::Attack() {
 
 			// 弾の速度
 			const float kBulletSpeed = 1.0f;
-			Vector3 velocity = worldTransform3DReticle_.translation_ - worldTransform_.translation_;
+			Vector3 velocity = worldTransform3DReticle_.translation_ - GetWorldPosition();
 			velocity = Normalize(velocity) * kBulletSpeed;
 
 			// 速度ベクトルを自機の向きに合わせて回転させる
-			velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+			/*velocity = TransformNormal(velocity, worldTransform_.matWorld_);*/
 
 			// 弾を生成、初期化
 			std::unique_ptr<PlayerBullet> newBullet = std::make_unique<PlayerBullet>();
