@@ -22,7 +22,8 @@ void GameScene::Initialize() {
 	isDebugCameraActive_ = false;
 	//自キャラの設定
 	player_ = std::make_unique<Player>();
-	player_->Initialize(model_.get(),textureHandle_);
+	modelPlayer_.reset(Model::CreateFromOBJ("player", true));
+	player_->Initialize(modelPlayer_.get());
 	//skydomeを生成
 	skydome_ = std::make_unique<Skydome>();
 	//3Dモデルの生成

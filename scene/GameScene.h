@@ -65,6 +65,8 @@ private: // メンバ変数
 
 	//自キャラ
 	std::unique_ptr<Player> player_ = nullptr;
+	//3Dモデル
+	std::unique_ptr<Model> modelPlayer_ = nullptr;
 
 	//天空
 	std::unique_ptr<Skydome> skydome_ = nullptr;
