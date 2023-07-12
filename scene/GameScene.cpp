@@ -19,7 +19,7 @@ void GameScene::Initialize() {
 	viewProjection_.Initialize();
 	//デバッグカメラ
 	debugCamera_ = new DebugCamera(dxCommon_->GetBackBufferWidth(), dxCommon_->GetBackBufferHeight());
-	isDebugCameraActive_ = false;
+	isDebugCameraActive_ = true;
 	//自キャラの設定
 	player_ = std::make_unique<Player>();
 	modelPlayer_.reset(Model::CreateFromOBJ("player", true));

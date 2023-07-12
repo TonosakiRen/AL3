@@ -60,7 +60,7 @@ private: // メンバ変数
 
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
-	bool isDebugCameraActive_;
+	bool isDebugCameraActive_ = true;
 
 
 	//自キャラ
