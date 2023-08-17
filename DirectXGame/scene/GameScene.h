@@ -14,6 +14,8 @@
 #include "Player.h"
 #include "Skydome.h"
 #include "Ground.h"
+#include "FollowCamera.h"
+#include "Enemy.h"
 
 /// <summary>
 /// ゲームシーン
@@ -65,8 +67,9 @@ private: // メンバ変数
 
 	//自キャラ
 	std::unique_ptr<Player> player_ = nullptr;
+
 	//3Dモデル
-	std::unique_ptr<Model> modelPlayer_ = nullptr;
+	std::vector<std::unique_ptr<Model>> modelPlayer_;
 
 	//天空
 	std::unique_ptr<Skydome> skydome_ = nullptr;
@@ -77,6 +80,16 @@ private: // メンバ変数
 	std::unique_ptr<Ground> ground_ = nullptr;
 	// 3DModel
 	std::unique_ptr<Model> modelGround_ = nullptr;
+
+	//追従カメラ
+	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
+
+	//enemy
+	std::unique_ptr<Enemy> enemy_ = nullptr;
+
+	//Enemyモデル
+	std::vector<std::unique_ptr<Model>> modelEnemy_;
+
 
 	/// <summary>
 	/// ゲームシーン用

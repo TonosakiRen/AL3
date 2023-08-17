@@ -4,6 +4,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
+#include <numbers>
 #include <assert.h>
 #include <cmath>
 
@@ -16,6 +17,8 @@ inline float clamp(float num, float min, float max) {
 	}
 	return num;
 }
+
+inline float Radian(float degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
 
 #pragma region Vector3
 // Vetor3
@@ -82,8 +85,14 @@ inline float Length(const Vector3& v) {
 // 正規化
 inline Vector3 Normalize(const Vector3& v) {
 	float tmp = v.x * v.x + v.y * v.y + v.z * v.z;
+	Vector3 result = {0.0f,0.0f,0.0f};
 	tmp = sqrtf(tmp);
-	return {v.x / tmp, v.y / tmp, v.z / tmp};
+	if (tmp != 0.0f) {
+		result.x = v.x / tmp;
+		result.y = v.y / tmp;
+		result.z = v.z / tmp;
+	}
+	return {result};
 }
 // ベクトル変換
 inline Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
@@ -614,6 +623,7 @@ inline Matrix4x4 MakeRotateZMatrix(float radian) {
 
 	return tmp;
 }
+
 inline Matrix4x4
     MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
@@ -629,43 +639,6 @@ inline Matrix4x4
 
 inline Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2) {
 	m1 = m1 * m2;
-	/*Matrix4x4 tmp;
-	tmp.m[0][0] = m1.m[0][0] * m2.m[0][0] + m1.m[0][1] * m2.m[1][0] + m1.m[0][2] * m2.m[2][0] +
-	              m1.m[0][3] * m2.m[3][0];
-	tmp.m[0][1] = m1.m[0][0] * m2.m[0][1] + m1.m[0][1] * m2.m[1][1] + m1.m[0][2] * m2.m[2][1] +
-	              m1.m[0][3] * m2.m[3][1];
-	tmp.m[0][2] = m1.m[0][0] * m2.m[0][2] + m1.m[0][1] * m2.m[1][2] + m1.m[0][2] * m2.m[2][2] +
-	              m1.m[0][3] * m2.m[3][2];
-	tmp.m[0][3] = m1.m[0][0] * m2.m[0][3] + m1.m[0][1] * m2.m[1][3] + m1.m[0][2] * m2.m[2][3] +
-	              m1.m[0][3] * m2.m[3][3];
-
-	tmp.m[1][0] = m1.m[1][0] * m2.m[0][0] + m1.m[1][1] * m2.m[1][0] + m1.m[1][2] * m2.m[2][0] +
-	              m1.m[1][3] * m2.m[3][0];
-	tmp.m[1][1] = m1.m[1][0] * m2.m[0][1] + m1.m[1][1] * m2.m[1][1] + m1.m[1][2] * m2.m[2][1] +
-	              m1.m[1][3] * m2.m[3][1];
-	tmp.m[1][2] = m1.m[1][0] * m2.m[0][2] + m1.m[1][1] * m2.m[1][2] + m1.m[1][2] * m2.m[2][2] +
-	              m1.m[1][3] * m2.m[3][2];
-	tmp.m[1][3] = m1.m[1][0] * m2.m[0][3] + m1.m[1][1] * m2.m[1][3] + m1.m[1][2] * m2.m[2][3] +
-	              m1.m[1][3] * m2.m[3][3];
-
-	tmp.m[2][0] = m1.m[2][0] * m2.m[0][0] + m1.m[2][1] * m2.m[1][0] + m1.m[2][2] * m2.m[2][0] +
-	              m1.m[2][3] * m2.m[3][0];
-	tmp.m[2][1] = m1.m[2][0] * m2.m[0][1] + m1.m[2][1] * m2.m[1][1] + m1.m[2][2] * m2.m[2][1] +
-	              m1.m[2][3] * m2.m[3][1];
-	tmp.m[2][2] = m1.m[2][0] * m2.m[0][2] + m1.m[2][1] * m2.m[1][2] + m1.m[2][2] * m2.m[2][2] +
-	              m1.m[2][3] * m2.m[3][2];
-	tmp.m[2][3] = m1.m[2][0] * m2.m[0][3] + m1.m[2][1] * m2.m[1][3] + m1.m[2][2] * m2.m[2][3] +
-	              m1.m[2][3] * m2.m[3][3];
-
-	tmp.m[3][0] = m1.m[3][0] * m2.m[0][0] + m1.m[3][1] * m2.m[1][0] + m1.m[3][2] * m2.m[2][0] +
-	              m1.m[3][3] * m2.m[3][0];
-	tmp.m[3][1] = m1.m[3][0] * m2.m[0][1] + m1.m[3][1] * m2.m[1][1] + m1.m[3][2] * m2.m[2][1] +
-	              m1.m[3][3] * m2.m[3][1];
-	tmp.m[3][2] = m1.m[3][0] * m2.m[0][2] + m1.m[3][1] * m2.m[1][2] + m1.m[3][2] * m2.m[2][2] +
-	              m1.m[3][3] * m2.m[3][2];
-	tmp.m[3][3] = m1.m[3][0] * m2.m[0][3] + m1.m[3][1] * m2.m[1][3] + m1.m[3][2] * m2.m[2][3] +
-	              m1.m[3][3] * m2.m[3][3];
-	m1 = tmp;*/
 	return m1;
 }
 // 向いてるベクトル角度

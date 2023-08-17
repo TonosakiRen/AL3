@@ -19,11 +19,24 @@ void GameScene::Initialize() {
 	viewProjection_.Initialize();
 	//デバッグカメラ
 	debugCamera_ = new DebugCamera(dxCommon_->GetBackBufferWidth(), dxCommon_->GetBackBufferHeight());
-	isDebugCameraActive_ = true;
+	isDebugCameraActive_ = false;
+	// 追従カメラ
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize();
 	//自キャラの設定
 	player_ = std::make_unique<Player>();
-	modelPlayer_.reset(Model::CreateFromOBJ("player", true));
-	player_->Initialize(modelPlayer_.get());
+
+	modelPlayer_.resize(static_cast<int>(Player::Parts::PartsNum));
+
+	modelPlayer_[static_cast<int>(Player::Parts::Body)].reset(Model::CreateFromOBJ("player_body", true));
+	modelPlayer_[static_cast<int>(Player::Parts::Head)].reset(Model::CreateFromOBJ("player_head", true));
+	modelPlayer_[static_cast<int>(Player::Parts::L_arm)].reset(Model::CreateFromOBJ("player_left_hand", true));
+	modelPlayer_[static_cast<int>(Player::Parts::R_arm)].reset(Model::CreateFromOBJ("player_right_hand", true));
+	modelPlayer_[static_cast<int>(Player::Parts::Hammer)].reset( Model::CreateFromOBJ("hammer", true));
+	player_->Initialize(modelPlayer_);
+	player_->SetViewProjection(&followCamera_->GetViewProjection());
+	// 自キャラのワールドトランスフォームを追従カメラにセット
+	followCamera_->SetTarget(&player_->GetWorldTransform());
 	//skydomeを生成
 	skydome_ = std::make_unique<Skydome>();
 	//3Dモデルの生成
@@ -36,6 +49,12 @@ void GameScene::Initialize() {
 	modelGround_.reset(Model::CreateFromOBJ("ground", true));
 	ground_->Initialize(modelGround_.get());
 
+	//敵の生成
+	enemy_ = std::make_unique<Enemy>();
+	modelEnemy_.resize(static_cast<int>(Enemy::Parts::PartsNum));
+	modelEnemy_[static_cast<int>(Enemy::Parts::Body)].reset(Model::CreateFromOBJ("enemy", true));
+	enemy_->Initialize(modelEnemy_);
+	
 }
 
 void GameScene::Update() {
@@ -46,13 +65,22 @@ void GameScene::Update() {
 		isDebugCameraActive_ = false;
 	}
 #endif
+	
 	//自キャラ更新
 	player_->Update();
+	//敵キャラ更新
+	enemy_->Update();
 	// カメラの処理
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	} else {
+		// 追従カメラの更新
+		followCamera_->Update();
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
 	}
 }
@@ -84,10 +112,12 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	// 3Dモデル描画
+
+
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
-
 	player_->Draw(viewProjection_);
+	enemy_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
