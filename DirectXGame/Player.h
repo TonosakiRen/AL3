@@ -13,8 +13,8 @@
 class Player : public BaseCharacter {
 public:
 
-	////調整項目の適用
-	//void ApplyGlobalVariables();
+	//調整項目の適用
+	void ApplyGlobalVariables();
 
 	/// <summary>
 	/// 初期化

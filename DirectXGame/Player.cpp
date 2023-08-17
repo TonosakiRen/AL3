@@ -5,26 +5,26 @@
 #include "ImGui.h"
 #include "GlobalVariables.h"
    
-//void Player::ApplyGlobalVariables() { 
-//	
-//	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
-//	const char* groupName = "Player";
-//	floatingSpeed = globalVariables->GetFloatValue(groupName, "floatingSpeed");
-//}
+void Player::ApplyGlobalVariables() { 
+	
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	floatingSpeed = globalVariables->GetFloatValue(groupName, "floatingSpeed");
+}
 
 /// 初期化
 /// </summary>
 /// <param name="model">モデル</param>
 void Player::Initialize(const std::vector<std::unique_ptr<Model>>& models) {
 
-	//GlobalVariables* globalVariables = GlobalVariables::GetInstance();
-	//const char* groupName = "Player";
-	//// グループを追加
-	//GlobalVariables::GetInstance()->CreateGroup(groupName);
-	//globalVariables->AddItem(
-	//    groupName, "floatingSpeed", floatingSpeed);
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	// グループを追加
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+	globalVariables->AddItem(
+	    groupName, "floatingSpeed", floatingSpeed);
 
-	//ApplyGlobalVariables();
+	ApplyGlobalVariables();
 
 	BaseCharacter::Initialize(models);
 	worldTransform_.translation_ = {0.0f, 1.0f, 0.0f};
