@@ -20,20 +20,16 @@ void GameScene::Initialize() {
 	//デバッグカメラ
 	debugCamera_ = new DebugCamera(dxCommon_->GetBackBufferWidth(), dxCommon_->GetBackBufferHeight());
 	isDebugCameraActive_ = false;
-	// 追従カメラ
-	followCamera_ = std::make_unique<FollowCamera>();
-	followCamera_->Initialize();
 	//自キャラの設定
 	player_ = std::make_unique<Player>();
 
 	modelPlayer_.resize(static_cast<int>(Player::Parts::PartsNum));
 
-	modelPlayer_[static_cast<int>(Player::Parts::Body)].reset(Model::CreateFromOBJ("player_body", true));
-	modelPlayer_[static_cast<int>(Player::Parts::Head)].reset(Model::CreateFromOBJ("player_head", true));
-	modelPlayer_[static_cast<int>(Player::Parts::L_arm)].reset(Model::CreateFromOBJ("player_left_hand", true));
-	modelPlayer_[static_cast<int>(Player::Parts::R_arm)].reset(Model::CreateFromOBJ("player_right_hand", true));
-	modelPlayer_[static_cast<int>(Player::Parts::Hammer)].reset( Model::CreateFromOBJ("hammer", true));
+	modelPlayer_[static_cast<int>(Player::Parts::Body)].reset(Model::CreateFromOBJ("player", true));
 	player_->Initialize(modelPlayer_);
+	// 追従カメラ
+	followCamera_ = std::make_unique<FollowCamera>();
+	followCamera_->Initialize(player_.get());
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
 	// 自キャラのワールドトランスフォームを追従カメラにセット
 	followCamera_->SetTarget(&player_->GetWorldTransform());

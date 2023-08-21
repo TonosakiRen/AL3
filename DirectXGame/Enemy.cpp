@@ -32,6 +32,7 @@ void Enemy::Update() {
 	// 移動
 	worldTransform_.translation_ = worldTransform_.translation_ + move;
 
+
 	worldTransform_.UpdateMatrix();
 	modelWorldTransform_[static_cast<int>(Enemy::Parts::Body)].UpdateMatrix();
 }
