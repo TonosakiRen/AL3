@@ -27,6 +27,8 @@ public:
 
 	enum class Parts { Body, PartsNum };
 
+	WorldTransform* GetWorldTransform() { return &worldTransform_; }
+
 	private:
 	// ワールド変換データ
 	WorldTransform modelWorldTransform_[static_cast<int>(Enemy::Parts::PartsNum)];

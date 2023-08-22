@@ -30,10 +30,10 @@ void Enemy::Update() {
 	worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 
 	// 移動
-	worldTransform_.translation_ = worldTransform_.translation_ + move;
+	//worldTransform_.translation_ = worldTransform_.translation_ + move;
 
 
-	worldTransform_.UpdateMatrix();
+	//worldTransform_.UpdateMatrix();
 	modelWorldTransform_[static_cast<int>(Enemy::Parts::Body)].UpdateMatrix();
 }
 
