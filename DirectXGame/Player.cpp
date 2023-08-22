@@ -25,6 +25,8 @@ void Player::Initialize(const std::vector<std::unique_ptr<Model>>& models) {
 	//    groupName, "floatingSpeed", floatingSpeed);
 
 	//ApplyGlobalVariables();
+	uint32_t textureReticle = TextureManager::Load("reticle.png");
+	sprite2DReticle_.reset(Sprite::Create(textureReticle, {1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f}));
 
 	BaseCharacter::Initialize(models);
 	worldTransform_.translation_ = {0.0f, 1.0f, 0.0f};
@@ -40,7 +42,7 @@ void Player::Update() {
 	// gamePadが有効なら
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 		// 速さ
-		const float speed = 0.3f;
+		const float speed = 0.2f;
 		// 移動量
 		Vector3 move = {
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX, 0.0f,
@@ -52,7 +54,8 @@ void Player::Update() {
 		move = TransformNormal(move, rotateMatrix);
 
 		// Y軸周り角度(θy)
-		if ((float)joyState.Gamepad.sThumbLX != 0.0f || (float)joyState.Gamepad.sThumbLY != 0.0f) {
+		if ((float)joyState.Gamepad.sThumbLX != 0.0f ||
+		    (float)joyState.Gamepad.sThumbLY != 0.0f) {
 			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 			playerDirection = move;
 		}
@@ -60,9 +63,28 @@ void Player::Update() {
 		// 移動
 		worldTransform_.translation_ = worldTransform_.translation_ + move;
 
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-			behaviorRequest_ = Behavior::kAttack;
+
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isFocus == false && preRightBotton == false) {
+			isFocus = true;
+		} else if (
+		    joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && isFocus == true &&
+		    preRightBotton == false) {
+			isFocus = false;
 		}
+
+
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ) {
+			preRightBotton = true;
+		} else {
+			preRightBotton = false;
+		}
+		
+
+		if (isFocus == true) {
+			Vector3 toFocus = focus_->translation_ - worldTransform_.translation_;
+			OrientVector(worldTransform_.rotation_, toFocus);
+		}
+
 	}
 	
 	worldTransform_.UpdateMatrix();
@@ -76,3 +98,5 @@ void Player::Draw(const ViewProjection& viewProjection) {
 		index++;
 	}
 }
+
+void Player::DrawUI() { sprite2DReticle_->Draw(); }

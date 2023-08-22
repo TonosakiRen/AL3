@@ -42,5 +42,12 @@ private:
 	float a = 0.0f;
 
 	bool isFocus = false;
-	float focusMoveT = 0.0f;
+	Vector3 offset_ = {4.0f,4.0f,-10.0f};
+	float focusMoveT = 3.0f;
+	float rataionspeed = 0.057f;
+	float movespeed = 0.90f;
+
+	// 結果
+	Vector3 goalRotation = {0.0f, 0.0f, 0.0f};
+	Vector3 goalTranslation = {0.0f, 0.0f, 0.0f};
 };

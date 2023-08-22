@@ -66,6 +66,9 @@ void GameScene::Update() {
 	player_->Update();
 	//敵キャラ更新
 	enemy_->Update();
+
+	player_->SetFocus(enemy_->GetWorldTransform());
+
 	// カメラの処理
 	if (isDebugCameraActive_) {
 		debugCamera_->Update();
@@ -93,6 +96,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
+	player_->DrawUI();
+	
 
 	// スプライト描画後処理
 	Sprite::PostDraw();

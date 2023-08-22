@@ -18,6 +18,20 @@ inline float clamp(float num, float min, float max) {
 	return num;
 }
 
+inline bool closeValue(float& num, float goal,float speed) {
+	if (std::fabs(num - goal) < std::fabs(speed)) {
+		num = goal;
+		return true;
+	}
+	if (num < goal) {
+		num += speed;
+	}
+	if (num > goal) {
+		num -= speed;
+	}
+	return false;
+}
+
 inline float Radian(float degree) { return degree * std::numbers::pi_v<float> / 180.0f; }
 
 #pragma region Vector3
@@ -138,6 +152,46 @@ inline Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) {
 	return Vector3{
 	    factorA * a.x + factorB * b.x, factorA * a.y + factorB * b.y,
 	    factorA * a.z + factorB * b.z};
+}
+
+inline bool closeVector3(Vector3& num, Vector3 goal, float speed) {
+	if ((std::fabs(num.x - goal.x) < std::fabs(speed)) &&
+	    (std::fabs(num.y - goal.y) < std::fabs(speed)) &&
+	    (std::fabs(num.z - goal.z) < std::fabs(speed))) {
+		num = goal;
+		return true;
+	}
+	
+	if (std::fabs(num.x - goal.x) < std::fabs(speed)) {
+		num.x = goal.x;
+	}else
+	if (num.x < goal.x) {
+		num.x += speed;
+	}else
+	if (num.x > goal.x) {
+		num.x -= speed;
+	}
+
+	if (std::fabs(num.y - goal.y) < std::fabs(speed)) {
+		num.y = goal.y;
+	} else
+	if (num.y < goal.y) {
+		num.y += speed;
+	}else
+	if (num.y > goal.y) {
+		num.y -= speed;
+	}
+
+	if (std::fabs(num.z - goal.z) < std::fabs(speed)) {
+		num.z = goal.z;
+	} else
+	if (num.z < goal.z) {
+		num.z += speed;
+	}else
+	if (num.z > goal.z) {
+		num.z -= speed;
+	}
+	return false;
 }
 
 #pragma endregion
@@ -673,6 +727,15 @@ inline Matrix4x4 MakeViewportMatrix(
 	tmp.m[3][2] = minDepth;
 	tmp.m[3][3] = 1;
 	return tmp;
+}
+
+//ベクトルの方向に向ける
+inline void OrientVector(Vector3& rotation, Vector3& focus) { 
+	Vector3 toFocus = Normalize(focus); 
+	rotation.y = std::atan2(toFocus.x, toFocus.z);
+	Matrix4x4 tmp = MakeRotateYMatrix(-std::atan2(toFocus.x, toFocus.z));
+	Vector3 tmpZ = Transform(toFocus, tmp);
+	rotation.x = std::atan2(-tmpZ.y, tmpZ.z);
 }
 
 #pragma endregion
