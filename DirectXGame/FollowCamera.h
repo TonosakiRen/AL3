@@ -50,4 +50,5 @@ private:
 	// 結果
 	Vector3 goalRotation = {0.0f, 0.0f, 0.0f};
 	Vector3 goalTranslation = {0.0f, 0.0f, 0.0f};
+	
 };

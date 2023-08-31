@@ -8,7 +8,19 @@ void WorldTransform::UpdateMatrix() {
 	// 親があれば親のワールド行列を掛ける
 	if (parent_) {
 		matWorld_ *= parent_->matWorld_;
+
+		worldRotateMatrix_ = MakeRotateMatrix(rotation_) * MakeRotateMatrix(parent_->rotation_);
+		worldScale_ = scale_ * parent_->scale_;
+		worldTranslation_ =
+		    parent_->translation_ + 
+		    translation_ * MakeRotateMatrix(parent_->rotation_);
+	} else {
+		worldRotateMatrix_ = MakeRotateMatrix(rotation_);
+		worldScale_ = scale_;
+		worldTranslation_ = translation_;
 	}
+
+	
 
 	// 定数バッファに転送する
 	if (constBuff_) {

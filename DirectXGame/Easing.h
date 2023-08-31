@@ -1,7 +1,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
-#include <math.h>
-#include "Vector2.h"
+#include "Mymath.h"
 #include<functional>
 #include<iostream>
 class Easing
@@ -109,6 +108,18 @@ public:
 	static Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, float& t, float speed, EasingMode easingMode, bool isAdd = true);
 
 	static Vector2 Bezier(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Vector2& p3, float& t, float speed, EasingMode easingMode, bool isAdd = true);
+
+	static Vector3 easing(
+	    float& t, Vector3 start, Vector3 end, float speed, EasingMode easingMode,
+	    bool isAdd = true);
+
+	static Vector3 Bezier(
+	    const Vector3& p0, const Vector3& p1, const Vector3& p2, float& t, float speed,
+	    EasingMode easingMode, bool isAdd = true);
+
+	static Vector3 Bezier(
+	    const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float& t,
+	    float speed, EasingMode easingMode, bool isAdd = true);
 
 
 private:

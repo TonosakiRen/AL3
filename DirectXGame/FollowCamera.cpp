@@ -52,18 +52,16 @@ void FollowCamera::Update() {
 
 			OrientVector(goalRotation, focus);
 
-			ImGui::Begin("pl");
-			ImGui::DragFloat("rortaitoneppe", &rataionspeed,Radian(0.1f));
-			ImGui::DragFloat("moveoneppe", &movespeed, 0.1f);
-			ImGui::End();
-
-			closeVector3(viewProjection_.rotation_, goalRotation, rataionspeed);
+			closeRotate(viewProjection_.rotation_, goalRotation, rataionspeed);
 			closeVector3(viewProjection_.translation_, goalTranslation, movespeed);
 			
 		}
 
 		
 	} else {
+
+		
+
 		// 追従対象がいれば
 		if (target_) {
 

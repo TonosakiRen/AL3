@@ -16,6 +16,7 @@
 #include "Ground.h"
 #include "FollowCamera.h"
 #include "Enemy.h"
+#include "WinApp.h"
 
 /// <summary>
 /// ゲームシーン
@@ -37,6 +38,8 @@ public: // メンバ関数
 	/// 初期化
 	/// </summary>
 	void Initialize();
+
+	void Collision();
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -90,6 +93,23 @@ private: // メンバ変数
 	//Enemyモデル
 	std::vector<std::unique_ptr<Model>> modelEnemy_;
 
+	enum Scene {
+		title,
+		inGame
+	};
+
+	Scene scene = title;
+
+	std::unique_ptr<Sprite> title_ = nullptr;
+	std::unique_ptr<Sprite> push_ = nullptr;
+	std::unique_ptr<Sprite> gameOver_ = nullptr;
+	std::unique_ptr<Sprite> gameClear_ = nullptr;
+	std::unique_ptr<Sprite> hpBar_ = nullptr;
+	std::unique_ptr<Sprite> frame_ = nullptr;
+	std::unique_ptr<Sprite> heart_[6];
+
+	int puchCooltime = 0;
+	int ACooltime = 0;
 
 	/// <summary>
 	/// ゲームシーン用

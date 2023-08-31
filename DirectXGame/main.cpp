@@ -6,6 +6,7 @@
 #include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include "WinApp.h"
+#include "Randam.h"
 //#include "GlobalVariables.h"
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -61,10 +62,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//グローバル変数の読み込み
 	/*GlobalVariables::GetInstance()->Loadfiles();*/
 
+	Randam::SRAND();
+
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
-
+	
 	// メインループ
 	while (true) {
 		// メッセージ処理

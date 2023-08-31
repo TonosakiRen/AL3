@@ -29,6 +29,11 @@ struct WorldTransform {
 	// 親となるワールド変換へのポインタ
 	const WorldTransform* parent_ = nullptr;
 
+	//rotateMatrix
+	Matrix4x4 worldRotateMatrix_ = {0.0f, 0.0f, 0.0f};
+	Vector3 worldScale_ = {1.0f, 1.0f, 1.0f};
+	Vector3 worldTranslation_ = {0, 0, 0};
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
