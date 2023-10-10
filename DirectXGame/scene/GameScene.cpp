@@ -296,7 +296,6 @@ void GameScene::Draw() {
 		hpBar_->SetSize({1280.0f * (enemy_->GetHp() / 300.0f),720.0f});
 		hpBar_->Draw();
 		frame_->Draw();
-		
 
 		if (player_->GetisDead()) {
 			gameOver_->Draw();
