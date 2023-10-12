@@ -21,8 +21,7 @@ void Player::Initialize(const std::vector<std::unique_ptr<Model>>& models) {
 	const char* groupName = "Player";
 	// グループを追加
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	globalVariables->AddItem(
-	    groupName, "floatingSpeed", floatingSpeed);
+	globalVariables->AddItem(groupName, "floatingSpeed", floatingSpeed);
 
 	ApplyGlobalVariables();
 
@@ -46,7 +45,7 @@ void Player::Initialize(const std::vector<std::unique_ptr<Model>>& models) {
 }
 
 void Player::Update() { 
-	
+	ApplyGlobalVariables();
 	if (behaviorRequest_) {
 		//振る舞いを変更する
 		behavior_ = behaviorRequest_.value();

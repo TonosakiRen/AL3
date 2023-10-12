@@ -279,10 +279,12 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 }
 
 int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::string& key) const {
-	//グループを検索
-	const auto& groupIt = datas_.find(groupName);
-	//未登録チェック
+#ifdef _DEBUG
+	/ グループを検索 const auto& groupIt = datas_.find(groupName);
+	// 未登録チェック
 	assert(groupIt != datas_.end());
+#endif // _DEBUG
+
 	// グループの参照を取得
 	const Group& group = datas_.at(groupName);
 
@@ -292,9 +294,11 @@ int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::st
 	return std::get<int32_t>(item);
 }
 float GlobalVariables::GetFloatValue(const std::string& groupName, const std::string& key) const {//グループを検索
-	const auto& groupIt = datas_.find(groupName);
+#ifdef _DEBUG
+	/ グループを検索 const auto& groupIt = datas_.find(groupName);
 	// 未登録チェック
 	assert(groupIt != datas_.end());
+#endif // _DEBUG
 	// グループの参照を取得
 	const Group& group = datas_.at(groupName);
 
@@ -304,9 +308,11 @@ float GlobalVariables::GetFloatValue(const std::string& groupName, const std::st
 	return std::get<float>(item);
 }
 Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) const {//グループを検索
-	const auto& groupIt = datas_.find(groupName);
+#ifdef _DEBUG
+	/ グループを検索 const auto& groupIt = datas_.find(groupName);
 	// 未登録チェック
 	assert(groupIt != datas_.end());
+#endif // _DEBUG
 	// グループの参照を取得
 	const Group& group = datas_.at(groupName);
 
