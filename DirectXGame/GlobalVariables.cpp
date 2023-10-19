@@ -280,7 +280,8 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 
 int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::string& key) const {
 #ifdef _DEBUG
-	/ グループを検索 const auto& groupIt = datas_.find(groupName);
+	// グループを検索
+	const auto& groupIt = datas_.find(groupName);
 	// 未登録チェック
 	assert(groupIt != datas_.end());
 #endif // _DEBUG
@@ -295,7 +296,8 @@ int32_t GlobalVariables::GetIntValue(const std::string& groupName, const std::st
 }
 float GlobalVariables::GetFloatValue(const std::string& groupName, const std::string& key) const {//グループを検索
 #ifdef _DEBUG
-	/ グループを検索 const auto& groupIt = datas_.find(groupName);
+	// グループを検索 
+	const auto& groupIt = datas_.find(groupName);
 	// 未登録チェック
 	assert(groupIt != datas_.end());
 #endif // _DEBUG
@@ -309,7 +311,8 @@ float GlobalVariables::GetFloatValue(const std::string& groupName, const std::st
 }
 Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) const {//グループを検索
 #ifdef _DEBUG
-	/ グループを検索 const auto& groupIt = datas_.find(groupName);
+	// グループを検索
+	const auto& groupIt = datas_.find(groupName);
 	// 未登録チェック
 	assert(groupIt != datas_.end());
 #endif // _DEBUG
